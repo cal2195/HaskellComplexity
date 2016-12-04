@@ -17,6 +17,15 @@
 #  location: "./custom-snapshot.yaml"
 resolver: lts-7.11
 
+docker:
+  enable: true # warning!
+
+# stack image container 
+image:
+  container:
+    name: use-cloudhaskell
+    base: fpco/stack-run
+
 # User packages to be built.
 # Various formats can be used as shown in the example below.
 #

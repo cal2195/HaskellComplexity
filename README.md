@@ -23,3 +23,26 @@ stack exec use-cloudhaskell-exe manager localhost 8005 100
 ```
 
 To understand the ouput, consult the code.
+
+__Docker-Compose__
+
+The basic architecture of the work stealing pattern has a manager node as a central component surrounded by a set of
+worker nodes. Each worker node is presumed to execute on a different node such that the total computational capacity of
+the worker node set are aailable to us to deliver processing. 
+
+Launching worker nodes individually is inconvenient and so I have added a `docker-compose.yml` file to the project. To
+launch a set of worker nodes, run:
+
+```
+docker-compose up
+```
+
+One may now launch a manager node to passwork for these nodes:
+
+``` bash
+stack exec use-cloudhaskell-exe manager localhost 8085 100
+```
+
+where the final parameter is the size of the number range (see the code to see the specifics on what the project is
+calculating). 
+
