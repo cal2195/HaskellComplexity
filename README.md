@@ -44,5 +44,6 @@ stack exec use-cloudhaskell-exe manager localhost 8085 100
 ```
 
 where the final parameter is the size of the number range (see the code to see the specifics on what the project is
-calculating). 
+calculating).
 
+This project is a companion to the REST service client [use-haskell-client](https://bitbucket.org/esjmb/use-haskell-client) and [use-haskell-api](https://bitbucket.org/esjmb/use-haskell-api).
