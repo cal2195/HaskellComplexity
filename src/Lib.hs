@@ -76,8 +76,8 @@ manager n workers = do
   workQueue <- spawnLocal $ do
     -- Return the next bit of work to be done
     forM_ [1 .. n] $ \m -> do
-      them <- expect   -- await a message from a free worker asking for work
-      send them m     -- send them work
+      pid <- expect   -- await a message from a free worker asking for work
+      send pid m     -- send them work
 
     -- Once all the work is done tell the workers to terminate. We do this by sending every worker who sends a message
     -- to us a null content: () . We do this only after we have distributed all the work in the forM_ loop above. Note
@@ -88,7 +88,7 @@ manager n workers = do
 
   -- Next, start worker processes on the given cloud haskell nodes. These will start
   -- asking for work from the workQueue thread immediately.
-  forM_ workers $ \nid -> spawn nid ($(mkClosure 'worker) (us, workQueue))
+  forM_ workers $ \ nid -> spawn nid ($(mkClosure 'worker) (us, workQueue))
   liftIO $ putStrLn $ "[Manager] Workers spawned"
   -- wait for all the results from the workers and return the sum total. Look at the implementation, whcih is not simply
   -- summing integer values, but instead is expecting results from workers.

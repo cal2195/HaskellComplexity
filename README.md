@@ -4,7 +4,7 @@ features that support the construction of a wide variety of multi-node distribut
 architectures. A simple message passing abstraction forms the basis of all communication.
 
 This project provides a command line switch for starting the application in master or worker mode. It is implemented
-using the work-pushing pattern described in http://www.well-typed.com/blog/71/. Comments below describe how it
+using the work-stealing pattern described in http://www.well-typed.com/blog/71/. Comments below describe how it
 operates. A docker-compose.yml file is provided that supports the launching of a master and set of workers.
 
 To use, build and do somethign like the following to start some clients:
