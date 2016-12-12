@@ -44,7 +44,7 @@ docker-compose up
 
 One may now launch a manager node to passwork for these nodes:
 
-``` bash
+``` 
 stack exec use-cloudhaskell-exe manager localhost 8085 100
 ```
 
