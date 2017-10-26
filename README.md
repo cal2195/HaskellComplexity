@@ -1,5 +1,5 @@
 The purpose of this project is to provide a baseline demonstration of the use of cloudhaskell in the context of the
-code complexity measurement individual programming project. The cloud haskell platform provides an elegant set of
+code complexity measurement individual programming task. The cloud haskell platform provides an elegant set of
 features that support the construction of a wide variety of multi-node distributed systems commuinication
 architectures. A simple message passing abstraction forms the basis of all communication.
 
