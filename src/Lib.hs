@@ -61,7 +61,9 @@ worker (manager, workQueue, repo) = do
             liftIO $ putStrLn $ "[Node " ++ (show us) ++ "] given work: " ++ show n
             liftIO $ resetMaster
             liftIO $ (resetToPrevCommit n)
+            liftIO $ putStrLn $ "Going to compute now!"
             total <- liftIO $ computeComplex
+            liftIO $ putStrLn $ "Computed " ++ (show total) ++ "!"
             send manager total
             liftIO $ putStrLn $ "[Node " ++ (show us) ++ "] finished work."
             go us -- note the recursion this function is called again!
@@ -88,7 +90,7 @@ manager repo workers = do
   -- requesting work.
   workQueue <- spawnLocal $ do
     -- Return the next bit of work to be done
-    forM_ [0 .. total] $ \m -> do
+    forM_ [0 .. total-1] $ \m -> do
       pid <- expect   -- await a message from a free worker asking for work
       send pid m     -- send them work
 
@@ -128,6 +130,7 @@ rtable = Lib.__remoteTable initRemoteTable
 someFunc :: IO ()
 someFunc = do
 
+  fetchDeps
 
   args <- getArgs
 
