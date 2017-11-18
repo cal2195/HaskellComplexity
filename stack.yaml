@@ -15,13 +15,7 @@
 # resolver:
 #  name: custom-snapshot
 #  location: "./custom-snapshot.yaml"
-resolver: nightly-2017-11-14
-
-# stack image container 
-image:
-  container:
-    name: use-cloudhaskell
-    base: fpco/stack-run
+resolver: lts-6.3 #nightly-2017-11-18
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
