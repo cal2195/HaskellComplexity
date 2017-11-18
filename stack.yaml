@@ -17,6 +17,11 @@
 #  location: "./custom-snapshot.yaml"
 resolver: lts-6.3 #nightly-2017-11-18
 
+# stack image container 
+image:
+  container:
+    name: use-cloudhaskell
+    base: haskell:7.10.3
 # User packages to be built.
 # Various formats can be used as shown in the example below.
 #

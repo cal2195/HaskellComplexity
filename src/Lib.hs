@@ -92,6 +92,7 @@ manager repo workers = do
     -- Return the next bit of work to be done
     forM_ [0 .. total-1] $ \m -> do
       pid <- expect   -- await a message from a free worker asking for work
+      liftIO $ putStrLn $ "Sending " ++ (show pid) ++ " work: " ++ (show m)
       send pid m     -- send them work
 
     -- Once all the work is done tell the workers to terminate. We do this by sending every worker who sends a message
