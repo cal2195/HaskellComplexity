@@ -30,19 +30,22 @@ import           Shell
 import           System.Environment                                 (getArgs)
 import           System.Exit
 
--- this is the work we get workers to do. It could be anything we want. To keep things simple, we'll calculate the
--- number of prime factors for the integer passed.
-doWork :: Integer -> Integer
-doWork = numPrimeFactors
-
 -- | worker function.
 -- This is the function that is called to launch a worker. It loops forever, asking for work, reading its message queue
 -- and sending the result of runnning numPrimeFactors on the message content (an integer).
-worker :: ( ProcessId  -- The processid of the manager (where we send the results of our work)
-         , ProcessId) -- the process id of the work queue (where we get our work from)
+worker :: (ProcessId  -- The processid of the manager (where we send the results of our work)
+         , ProcessId -- the process id of the work queue (where we get our work from)
+         , String) -- The repo to clone
        -> Process ()
-worker (manager, workQueue) = do
+worker (manager, workQueue, repo) = do
     us <- getSelfPid              -- get our process identifier
+
+    output <- liftIO $ cloneGitRepo $ repo
+    liftIO $ putStrLn $ output
+
+    total <- liftIO $ totalCommits
+    liftIO $ putStrLn $ ("Total Commits: " ++ (show total))
+
     liftIO $ putStrLn $ "Starting worker: " ++ show us
     go us
   where
@@ -56,7 +59,10 @@ worker (manager, workQueue) = do
       receiveWait
         [ match $ \n  -> do
             liftIO $ putStrLn $ "[Node " ++ (show us) ++ "] given work: " ++ show n
-            send manager (doWork n)
+            liftIO $ resetMaster
+            liftIO $ (resetToPrevCommit n)
+            total <- liftIO $ computeComplex
+            send manager total
             liftIO $ putStrLn $ "[Node " ++ (show us) ++ "] finished work."
             go us -- note the recursion this function is called again!
         , match $ \ () -> do
@@ -73,11 +79,9 @@ manager repo workers = do
   us <- getSelfPid
 
   output <- liftIO $ cloneGitRepo $ repo
-
   liftIO $ putStrLn $ output
 
   total <- liftIO $ totalCommits
-
   liftIO $ putStrLn $ ("Total Commits: " ++ (show total))
 
   -- first, we create a thread that generates the work tasks in response to workers
@@ -97,7 +101,7 @@ manager repo workers = do
 
   -- Next, start worker processes on the given cloud haskell nodes. These will start
   -- asking for work from the workQueue thread immediately.
-  forM_ workers $ \ nid -> spawn nid ($(mkClosure 'worker) (us, workQueue))
+  forM_ workers $ \ nid -> spawn nid ($(mkClosure 'worker) (us, workQueue, repo))
   liftIO $ putStrLn $ "[Manager] Workers spawned"
   -- wait for all the results from the workers and return the sum total. Look at the implementation, whcih is not simply
   -- summing integer values, but instead is expecting results from workers.
