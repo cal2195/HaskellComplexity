@@ -26,6 +26,7 @@ import           Control.Monad
 import           Network.Transport.TCP                              (createTransport,
                                                                      defaultTCPParameters)
 import           PrimeFactors
+import           Shell
 import           System.Environment                                 (getArgs)
 import           System.Exit
 
@@ -65,17 +66,25 @@ worker (manager, workQueue) = do
 
 remotable ['worker] -- this makes the worker function executable on a remote node
 
-manager :: Integer    -- The number range we wish to generate work for (there will be n work packages)
+manager :: String    -- The number range we wish to generate work for (there will be n work packages)
         -> [NodeId]   -- The set of cloud haskell nodes we will initalise as workers
         -> Process Integer
-manager n workers = do
+manager repo workers = do
   us <- getSelfPid
+
+  output <- liftIO $ cloneGitRepo $ repo
+
+  liftIO $ putStrLn $ output
+
+  total <- liftIO $ totalCommits
+
+  liftIO $ putStrLn $ ("Total Commits: " ++ (show total))
 
   -- first, we create a thread that generates the work tasks in response to workers
   -- requesting work.
   workQueue <- spawnLocal $ do
     -- Return the next bit of work to be done
-    forM_ [1 .. n] $ \m -> do
+    forM_ [0 .. total] $ \m -> do
       pid <- expect   -- await a message from a free worker asking for work
       send pid m     -- send them work
 
@@ -92,7 +101,7 @@ manager n workers = do
   liftIO $ putStrLn $ "[Manager] Workers spawned"
   -- wait for all the results from the workers and return the sum total. Look at the implementation, whcih is not simply
   -- summing integer values, but instead is expecting results from workers.
-  sumIntegers (fromIntegral n)
+  sumIntegers (fromIntegral total)
 
 -- note how this function works: initialised with n, the number range we started the program with, it calls itself
 -- recursively, decrementing the integer passed until it finally returns the accumulated value in go:acc. Thus, it will
@@ -119,11 +128,11 @@ someFunc = do
   args <- getArgs
 
   case args of
-    ["manager", host, port, n] -> do
+    ["manager", host, port, repo] -> do
       putStrLn "Starting Node as Manager"
       backend <- initializeBackend host port rtable
       startMaster backend $ \workers -> do
-        result <- manager (read n) workers
+        result <- manager (read repo) workers
         liftIO $ print result
     ["worker", host, port] -> do
       putStrLn "Starting Node as Worker"
