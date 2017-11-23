@@ -23,6 +23,8 @@ library
                      , distributed-process
                      , distributed-process-simplelocalnet
                      , process
+                     , text
+                     , scotty
   default-language:    Haskell2010
 
 executable use-cloudhaskell-exe

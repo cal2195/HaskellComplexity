@@ -1,6 +1,7 @@
 
 {-# LANGUAGE BangPatterns    #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE OverloadedStrings #-}
 --{-# CPP #-}
 
 -- | use-haskell
@@ -21,12 +22,16 @@ module Lib
 import           Control.Distributed.Process
 import           Control.Distributed.Process.Backend.SimpleLocalnet
 import           Control.Distributed.Process.Closure
+import           Control.Distributed.Process.Internal.Types
 import           Control.Distributed.Process.Node                   (initRemoteTable)
 import           Control.Monad
+import           Data.IORef
 import           Network.Transport.TCP                              (createTransport,
                                                                      defaultTCPParameters)
 import           PrimeFactors
 import           Shell
+import           Web.Scotty
+import           Data.Text.Lazy
 import           System.Environment                                 (getArgs)
 import           System.Exit
 
@@ -126,6 +131,15 @@ sumIntegers = go 0
 rtable :: RemoteTable
 rtable = Lib.__remoteTable initRemoteTable
 
+getNum :: Backend -> String -> IO Integer
+getNum backend repo = do
+                        num <- newIORef 0
+                        startMaster backend $ \workers -> do
+                          result <- (manager repo workers)
+                          liftIO $ writeIORef num result
+                        result <- readIORef num
+                        return result
+
 -- | This is the entrypoint for the program. We deal with program arguments and launch up the cloud haskell code from
 -- here.
 someFunc :: IO ()
@@ -136,12 +150,14 @@ someFunc = do
   args <- getArgs
 
   case args of
-    ["manager", host, port, repo] -> do
+    ["manager", host, port] -> do
       putStrLn "Starting Node as Manager"
       backend <- initializeBackend host port rtable
-      startMaster backend $ \workers -> do
-        result <- manager (read repo) workers
-        liftIO $ print result
+      scotty 3000 $ do
+        get "/complex" $ do
+          repo <- param "repo"
+          result <- liftIO $ (getNum backend repo)
+          html $ pack $ (show result)
     ["worker", host, port] -> do
       putStrLn "Starting Node as Worker"
       backend <- initializeBackend host port rtable
