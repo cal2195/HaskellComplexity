@@ -9,6 +9,15 @@ Then follow the instructions below to start the workers, then the master.
 Then you can `curl "http://localhost:3000/complex?repo=https://github.com/rubik/argon"` to compute the complexity of
 of the argon repo. You can swap this for any valid haskell repo.
 
+# Results
+
+On a dual core CPU with hyper threading, here was the results.
+
+![results](chart.png)
+
+As you can see, there is a vast improvement with increased numbers of nodes. This only slows down as I only have 4 logical cores,
+but on a real distributed network, this would work much better.
+
 # Haskell Computational Complexity
 
 The purpose of this project is to provide a baseline demonstration of the use of cloudhaskell in the context of the
