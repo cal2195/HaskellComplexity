@@ -1,14 +1,8 @@
 module Shell
-  (cloneGitRepo, totalCommits, resetMaster, resetToPrevCommit, computeComplex, fetchDeps) where
+  (cloneGitRepo, totalCommits, resetMaster, resetToPrevCommit, computeComplex) where
 
 import           Control.Monad
 import           System.Process
-
-fetchDeps :: IO String
-fetchDeps = do
-  readProcess "rm" ["-rf", "deps"] ""
-  result <- readProcess "git" ["clone", "https://github.com/cal2195/haskell-deps.git", "deps"] ""
-  return result
 
 cloneGitRepo :: String -> IO String
 cloneGitRepo repo = do
@@ -34,6 +28,6 @@ resetToPrevCommit num = do
 
 computeComplex :: IO Integer
 computeComplex = do
-  result <- readProcess "./deps/compute.sh" [] ""
+  result <- readProcess "sh" ["-c", "argon repo | awk -F '[()]' '{print $2}' | grep -Eo '[0-9]{1,4}' | awk '{s+=$1} END {print s}'"] ""
   let total = read result
   return total

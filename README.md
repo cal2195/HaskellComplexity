@@ -1,3 +1,16 @@
+# Prerequisites
+
+Argon needs to be installed and available on the current path (clone argon and `stack install`)
+
+Make sure `argon` can be run in the terminal.
+
+Then follow the instructions below to start the workers, then the master.
+
+Then you can `curl "http://localhost:3000/complex?repo=https://github.com/rubik/argon"` to compute the complexity of
+of the argon repo. You can swap this for any valid haskell repo.
+
+# Haskell Computational Complexity
+
 The purpose of this project is to provide a baseline demonstration of the use of cloudhaskell in the context of the
 code complexity measurement individual programming task. The cloud haskell platform provides an elegant set of
 features that support the construction of a wide variety of multi-node distributed systems commuinication

@@ -145,8 +145,6 @@ getNum backend repo = do
 someFunc :: IO ()
 someFunc = do
 
-  fetchDeps
-
   args <- getArgs
 
   case args of
